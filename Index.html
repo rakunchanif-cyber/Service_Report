@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Jungheinrich Service Report - PT Kobexindo Equipment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+    <style>
+        /* Standarisasi Dokumen & Cetak */
+        * { box-sizing: border-box; font-family: Arial, Helvetica, sans-serif; }
+        body { background-color: #525659; margin: 0; padding: 20px; display: flex; flex-direction: column; align-items: center; }
+        
+        .page-container { width: 100%; display: flex; flex-direction: column; align-items: center; }
+
+        .table-responsive-wrapper {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            padding-bottom: 15px;
+            display: flex;
+            justify-content: flex-start;
+        }
+        
+        @media min-width: 1100px {
+            .table-responsive-wrapper {
+                justify-content: center; 
+            }
+        }
+
+        .jsr-paper {
+            width: 1050px;
+            min-width: 1050px;
+            min-height: 1485px; 
+            background-color: #ffffff;
+            padding: 30px 25px;
+            position: relative;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+            margin: 0 auto;
+        }
+
+        .top-decor-bar { display: flex; width: 100%; height: 14px; margin-bottom: 10px; }
+        .decor-black { background-color: #000000; flex: 1; clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); }
+        .decor-red { background-color: #d32f2f; width: 40px; margin-left: -10px; clip-path: polygon(15% 0, 100% 0, 85% 100%, 0 100%); }
+
+        .header-block { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 15px; }
+        .company-info { width: 65%; }
+        .company-name { font-size: 18px; font-weight: bold; color: #000000; margin: 0 0 2px 0; }
+        .company-address { font-size: 8.5px; line-height: 1.3; color: #333333; margin: 0; }
+        .right-brand-area { width: 30%; text-align: right; }
+        .slogan-text { font-family: 'Georgia', serif; font-style: italic; font-size: 16px; font-weight: bold; color: #222; margin: 0 0 5px 0; }
+        .brand-logo-img { max-height: 40px; object-fit: contain; }
+
+        .title-row { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 10px; border-bottom: 2px solid #000; padding-bottom: 5px; }
+        .main-doc-title { font-size: 24px; font-weight: bold; letter-spacing: 0.5px; margin: 0; color: #000; }
+        .jh-brand-title { font-size: 22px; font-weight: 900; font-style: italic; color: #000; margin: 0; letter-spacing: -0.5px; }
+        .jh-brand-title span { color: #ffb300; } 
+
+        .jsr-table { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
+        .jsr-table td, .jsr-table th { border: 1px solid #000000; padding: 4.5px 5px; font-size: 10.5px; vertical-align: middle; color: #000000; }
+        .bg-light-gray { background-color: #f2f2f2; }
+        .text-center { text-align: center; }
+        .text-right { text-align: right; }
+
+        input[type="text"], input[type="number"] { width: 100%; border: none; outline: none; background: transparent; font-size: 11px; font-weight: bold; font-family: Courier, monospace; color: #000000; padding: 0; }
+        textarea { width: 100%; border: none; outline: none; background: transparent; font-size: 12px; font-weight: bold; font-family: Courier, monospace; line-height: 1.5; resize: none; }
+        .inline-checkbox-label { display: inline-flex; align-items: center; margin-right: 12px; font-size: 10.5px; font-weight: bold; cursor: pointer; }
+        .inline-checkbox-label input { margin-right: 4px; }
+        
+        /* FIX PENYEMPURNAAN TEKS VERTIKAL */
+        .vertical-text-th { 
+            width: 18px; 
+            max-width: 18px; 
+            height: 55px; /* Memberikan ruang tinggi agar teks tidak tertutup */
+            text-align: center; 
+            vertical-align: middle; 
+            padding: 0 !important; 
+        }
+        .vert-text {
+            display: inline-block;
+            transform: rotate(-90deg); /* Menggantikan writing-mode agar canvas tidak error */
+            white-space: nowrap;
+            font-size: 8.5px;
+            font-weight: bold;
+        }
+        
+        .status-box-cell { width: 18px; max-width: 18px; padding: 0 !important; text-align: center; vertical-align: middle; }
+        .box-clicker { width: 100%; height: 18px; display: block; cursor: pointer; background-color: #ffffff; font-weight: bold; font-size: 12px; line-height: 18px; text-align: center; user-select: none; }
+        .box-black-permanent { width: 100%; height: 18px; display: block; background-color: #000000 !important; cursor: default; pointer-events: none; }
+        .checklist-section-header { font-weight: bold; font-size: 11.5px; text-decoration: underline; padding: 5px 2px 2px 2px !important; background-color: #e6e6e6; }
+        .checklist-split-container { display: flex; justify-content: space-between; width: 100%; gap: 15px; margin-bottom: 10px; }
+        .checklist-column { width: 50%; }
+        .floating-action-panel { margin: 20px auto; text-align: center; }
+        .btn-download-pdf { background-color: #2e7d32; color: white; padding: 12px 30px; font-size: 14px; font-weight: bold; border: none; border-radius: 4px; cursor: pointer; box-shadow: 0 4px 6px rgba(0,0,0,0.2); text-transform: uppercase; }
+        .btn-download-pdf:hover { background-color: #1b5e20; }
+        @media print { body { background: #ffffff; padding: 0; } .jsr-paper { box-shadow: none !important; padding: 0; margin: 0; } .floating-action-panel { display: none !important; } }
+    </style>
+</head>
+<body>
+
+    <div class="page-container">
+        <div class="table-responsive-wrapper">
+            <div class="jsr-paper" id="jsr-document">
+                
+                <div class="top-decor-bar">
+                    <div class="decor-black"></div>
+                    <div class="decor-red"></div>
+                </div>
+
+                <div class="header-block">
+                    <div class="company-info">
+                        <h2 class="company-name">PT Kobexindo Equipment</h2>
+                        <p class="company-address">
+                            Head Office : Kobexindo Tower Jl. Pasir Putih Raya Blok E-5-D, Ancol, Pademangan Jakarta Utara 14430 P. (+62-21) 22644808 (hunting) F. (+62-21) 22644800<br>
+                            Product Support Center : Gedung Kobexindo Jl. Raya Bekasi - Karawang KM 58 Lemahabang, Cikarang, Bekasi, Jawa Barat 17823 P. (+62-21) 89140888 (hunting) F. (+62-21) 89140055<br>
+                            Branch Office : Medan • Batam • Lahat • Cilegon • Semarang • Sidoarjo • Banjarbaru • Batulicin • Tarakan • Balikpapan • Samarinda • Makassar • Kendari<br>
+                            <strong>www.kobexindo.com</strong>
+                        </p>
+                    </div>
+                    <div class="right-brand-area">
+                        <div class="slogan-text">Let's Grow Together</div>
+                        <img src="1000189153.png" class="brand-logo-img" alt="Logo KOBEX">
+                    </div>
+                </div>
+
+                <div class="title-row">
+                    <h1 class="main-doc-title">SERVICE REPORT</h1>
+                    <h1 class="jh-brand-title">JUNGHEINRICH</h1>
+                </div>
+
+                <table class="jsr-table">
+                    <tr>
+                        <td style="width: 14%;" class="bg-light-gray"><strong>Machine Model :</strong></td>
+                        <td style="width: 23%;"><input type="text" id="machineModel" placeholder="..."></td>
+                        <td style="width: 14%;" class="bg-light-gray"><strong>Inspection Date :</strong></td>
+                        <td style="width: 20%;"><input type="text" placeholder="..."></td>
+                        <td colspan="6" style="width: 29%; vertical-align: middle;">
+                            <label class="inline-checkbox-label"><input type="checkbox"> New Machine</label>
+                            <label class="inline-checkbox-label"><input type="checkbox"> Used :</label>
+                            <input type="text" style="width: 60px; border-bottom: 1px solid #000; font-size:10px;">
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="bg-light-gray"><strong>Serial number :</strong></td>
+                        <td><input type="text" placeholder="..."></td>
+                        <td class="bg-light-gray"><strong>Job Type :</strong></td>
+                        <td><input type="text" placeholder="..."></td>
+                        <td class="bg-light-gray" style="width: 10%;"><strong>Customer name</strong></td>
+                        <td colspan="5"><input type="text" placeholder="..."></td>
+                    </tr>
+                    <tr>
+                        <td class="bg-light-gray"><strong>Hourmeter :</strong></td>
+                        <td><input type="text" placeholder="..."></td>
+                        <td class="bg-light-gray"><strong>Year</strong></td>
+                        <td><input type="text" placeholder="..."></td>
+                        <td class="bg-light-gray"><strong>Machine Location</strong></td>
+                        <td colspan="5"><input type="text" placeholder="..."></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="font-size: 9.5px; font-weight: bold; font-style: italic;">
+                            Check items: &nbsp;&nbsp;&nbsp;&nbsp; √ = Good Condition &nbsp;&nbsp;&nbsp;&nbsp; X = Bad condition &nbsp;&nbsp;&nbsp;&nbsp; O = Correction made
+                        </td>
+                        <td class="text-center bg-light-gray" style="width: 5%;"><strong>PDI</strong></td>
+                        <td class="text-center bg-light-gray" style="width: 5%;"><strong>DLV</strong></td>
+                        <td class="text-center bg-light-gray" style="width: 5%;"><strong>Daily</strong></td>
+                        <td class="text-center bg-light-gray" style="width: 5%;"><strong>Monthly</strong></td>
+                        <td class="text-center bg-light-gray" style="width: 5%;"><strong>Yearly</strong></td>
+                        <td class="text-center bg-light-gray" style="width: 5%;"><strong>Campaign</strong></td>
+                    </tr>
+                    <tr>
+                        <td colspan="4" style="padding: 2px;">
+                            <div style="display:flex; width:100%; align-items:center; font-size:9px;">
+                                <div style="width:20px; height:11px; border:1px solid #000; margin-right:4px; background:#fff;"></div> No service required
+                                <div style="width:20px; height:11px; border:1px solid #000; margin-left:15px; margin-right:4px; background:#000;"></div> Service / Action Required
+                            </div>
+                        </td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                        <td class="text-center"><input type="checkbox"></td>
+                    </tr>
+                </table>
+
+                <div class="checklist-split-container">
+                    <div class="checklist-column">
+                        <table class="jsr-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Check items</th>
+                                    <th class="vertical-text-th"><span class="vert-text">PDI</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">DLV</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">Daily</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">Monthly</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">Yearly</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="checklist-section-header">Chassis/Superstructure</td></tr>
+                                <tr><td>Check all load bearing component for damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check screw connection</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Test the operation of the driver's position and check for damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check the identification points, data plates and warning are legible and replace if necessary</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Test safety belt operation, check for damage and make sure it is secure</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Test battery cover gas pressure spring and check for damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check all body painting & Mast</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                
+                                <tr><td colspan="6" class="checklist-section-header">Drive</td></tr>
+                                <tr><td>Lubricate the bearing between the drive motor and transmission</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check transmission for noise and leakage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check or Change transmission oil</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                
+                                <tr><td colspan="6" class="checklist-section-header">Wheels</td></tr>
+                                <tr><td>Check wheel for wear and damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check bearings and attachment</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check And Tightening Drive Wheels</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td style="font-style: italic; padding-left: 15px;">Specification : ( N/m ) Actual (N/m)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check And Tightening Load or Steering (CB only) Wheels</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td style="font-style: italic; padding-left: 15px;">Specification : ( N/m ) Actual (N/m)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                
+                                <tr><td colspan="6" class="checklist-section-header">Steering & Brake Systems</td></tr>
+                                <tr><td style="font-style: italic;">Specification : ( mm ) Actual (N/m)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check and test Parking Brake</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check brake mechanism, adjust and lubricate if necessary.</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check brake lines, connection and brake fluid level</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace brake fluid</td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+
+                                <tr><td colspan="6" class="checklist-section-header">Lift Mechanism</td></tr>
+                                <tr><td>Clean roller, guide rollers and contact surfaces in the mast<br><strong style="font-size:9px;">Attention : Danger of crashing</strong></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check mast attachment (bearings, and retaining screws)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check mast suspension</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Lubricate lift chain</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Lubricate contact surface</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Visual inspect rollers, slide pieces, and stops</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Torque mounting Mast Holder</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+                                <tr><td style="font-style: italic; padding-left: 15px;">Specification : ( N/m ) Actual (N/m)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check forks and fork carriage for wear and damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+
+                                <tr><td colspan="6" class="checklist-section-header">Attachment</td></tr>
+                                <tr><td>Test operation and setting</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check attachment on truck and load bearing component</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check bearings, guides and stops, for wear and damage, clean and lubricate, also clean and lubricate toothed racks</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check eccentric bolts and slicing strip adjustment on the traverse rotate fork</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Lubricate contact surfaces (rollers, guides, traverse bearing on the traverse rotate fork, etc)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+
+                                <tr><td colspan="6" class="checklist-section-header">Engine System</td></tr>
+                                <tr><td>Check Oil Engine Level</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace oil engine</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check breather filter</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="checklist-column">
+                        <table class="jsr-table">
+                            <thead>
+                                <tr>
+                                    <th style="text-align: left;">Check items</th>
+                                    <th class="vertical-text-th"><span class="vert-text">PDI</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">DLV</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">Daily</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">Monthly</span></th>
+                                    <th class="vertical-text-th"><span class="vert-text">Yearly</span></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td colspan="6" class="checklist-section-header">Engine System (Continued)</td></tr>
+                                <tr><td>Replace heater filter</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check fuel water separator</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace fuel water separator</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check air filter</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace air filter</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check level coolant</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace coolant</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check tension V-belt</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace V-belt</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+
+                                <tr><td colspan="6" class="checklist-section-header">Additional cold storage test</td></tr>
+                                <tr><td>Using appropriate means check chassis, lifting devise and load handler for cracks e.g. penetration test corrosive test, Replace any cracked bolts.</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check connectors and points for leaks and damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check hydraulic cylinder for leaks and damage and make sure it is secure</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+
+                                <tr><td colspan="6" class="checklist-section-header">Hydraulic System</td></tr>
+                                <tr><td>Check oil level</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace oil hydraulic</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+                                <tr><td>Check ventilation and discharge filter on hydraulic reservoir</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Replace ventilation and discharge filter on hydraulic reservoir</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+                                <tr><td>Test hose guide and check for damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+
+                                <tr><td colspan="6" class="checklist-section-header">Electrical, Sensors & Motors</td></tr>
+                                <tr><td>Make sure wire connection are secure (retorque/yearly) and check for damage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Test operation of warning devices and safety switches</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Make sure sensors are fixed, not damage clean and operational</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Test operation of instruments and display</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check contactors and relay, if necessary replace any worn parts</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Test Emergency Switch</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check fuse rating</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check Motor Hydraulic</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check Motor Drive</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check Motor Steering</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+
+                                <tr><td colspan="3" style="font-weight:bold; background-color:#dfdfdf;">Battery type : <input type="text" style="width: 50px;"></td><td colspan="3" style="font-weight:bold; background-color:#dfdfdf;">S/N : <input type="text" style="width: 50px;"></td></tr>
+                                <tr><td colspan="3" style="font-weight:bold; background-color:#dfdfdf;">Battery volt : <input type="text" style="width: 50px;"></td><td colspan="3" style="font-weight:bold; background-color:#dfdfdf;">AH : <input type="text" style="width: 50px;"></td></tr>
+                                
+                                <tr><td>Check acid density, acid level and cell voltage</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check terminals are securely attached and apply grease</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Clean battery connection, make sure they are secure</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check battery cables for damage, replace if necessary</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check short body max 10% volt battery <span style="float:right; font-weight:normal; font-style:italic;">(volt)</span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+
+                                <tr><td colspan="6" class="checklist-section-header">General measurements & Accessories</td></tr>
+                                <tr><td>Test travel speed and braking distance</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Test lift and lowering speed</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Check travel on the guidance wire, check maximum deviation and adjust if necessary (VNA)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td></tr>
+                                <tr><td>Operation & Maintenance manual</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+                                <tr><td>Parts book / CD Parts</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+                                <tr><td>Tools Kit</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+                                <tr><td colspan="6" class="checklist-section-header">Demonstration</td></tr>
+                                <tr><td>Field guidance (If Necessary)</td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td><td class="status-box-cell"><span class="box-clicker" onclick="cycleStatus(this)"></span></td><td class="status-box-cell"><span class="box-black-permanent"></span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div style="display: flex; justify-content: space-between; gap: 15px; margin-bottom: 10px;">
+                    <div style="width: 50%;">
+                        <div style="font-weight: bold; font-size: 11.5px; border: 1px solid #000; border-bottom:none; padding: 3px; text-align: center; background:#f2f2f2;">
+                            Based on above-report we used
+                        </div>
+                        <table class="jsr-table" style="margin-bottom: 0;">
+                            <thead>
+                                <tr class="bg-light-gray">
+                                    <th style="width: 10%; color:#000;">No</th>
+                                    <th style="width: 30%; color:#000;">Part No</th>
+                                    <th style="width: 45%; color:#000;">Description</th>
+                                    <th style="width: 15%; color:#000;">Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="text-center">1</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">2</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">3</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">4</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">5</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>                                
+                                <tr><td class="text-center">6</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div style="width: 50%;">
+                        <div style="font-weight: bold; font-size: 11.5px; border: 1px solid #000; border-bottom:none; padding: 3px; text-align: center; background:#f2f2f2;">
+                            We recommend you to order
+                        </div>
+                        <table class="jsr-table" style="margin-bottom: 0;">
+                            <thead>
+                                <tr class="bg-light-gray">
+                                    <th style="width: 10%; color:#000;">No</th>
+                                    <th style="width: 30%; color:#000;">Part No</th>
+                                    <th style="width: 45%; color:#000;">Description</th>
+                                    <th style="width: 15%; color:#000;">Qty</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="text-center">1</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">2</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">3</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">4</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">5</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                                <tr><td class="text-center">6</td><td><input type="text"></td><td><input type="text"></td><td class="text-center"><input type="text" class="text-center"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <table class="jsr-table">
+                    <tr>
+                        <td class="bg-light-gray" style="font-weight: bold; font-size: 11px;">Report of any other work carried out :</td>
+                    </tr>
+                    <tr>
+                        <td style="padding: 5px;">
+                            <textarea rows="3" placeholder="Tulis laporan tambahan di sini..."></textarea>
+                        </td>
+                    </tr>
+                </table>
+
+                <table class="jsr-table" style="margin-bottom: 5px;">
+                    <tr>
+                        <td style="width: 50%; height: 85px; vertical-align: top;">
+                            <strong style="font-size: 10px;">Inspected by :</strong>
+                            <div style="margin-top: 15px; margin-left: 60px; font-family: 'Brush Script MT', cursive, sans-serif; font-size: 24px; font-weight: normal; color: #000;">
+                                
+                            </div>
+                        </td>
+                        <td style="width: 50%; height: 85px; vertical-align: top;">
+                            <strong style="font-size: 10px;">Acknowledge by :</strong>
+                        </td>
+                    </tr>
+                </table>
+
+                <div style="display: flex; justify-content: space-between; align-items: center; font-size: 9px; font-weight: bold;">
+                    <div style="color: #444;">
+                        1. Service Division (White) &nbsp;&nbsp;&nbsp;&nbsp; 2. Branch (Green) &nbsp;&nbsp;&nbsp;&nbsp; 3. MSD (red) &nbsp;&nbsp;&nbsp;&nbsp; 4. Customer (Yellow)
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="floating-action-panel">
+        <button class="btn-download-pdf" onclick="generatePerfectJSRPDF()">
+            Download PDF Report (A2 Size)
+        </button>
+    </div>
+
+    <script>
+        function cycleStatus(element) {
+            const states = ['', 'X', '✓', 'O'];
+            let currentIndex = states.indexOf(element.innerText);
+            let nextIndex = (currentIndex + 1) % states.length;
+            element.innerText = states[nextIndex];
+        }
+
+        function generatePerfectJSRPDF() {
+            var element = document.getElementById('jsr-document');
+            var wrapper = document.querySelector('.table-responsive-wrapper');
+            var machineModelInput = document.getElementById('machineModel');
+            
+            var defaultName = machineModelInput.value.trim() || 'REPORT';
+            var customFileName = prompt("Masukkan nama file PDF yang diinginkan:", "JSR_" + defaultName);
+            
+            if (customFileName === null) return;
+            
+            customFileName = (customFileName.trim() || 'JSR_Report') + '.pdf';
+
+            element.querySelectorAll('input[type="text"], input[type="number"]').forEach(i => i.setAttribute('value', i.value));
+            element.querySelectorAll('input[type="checkbox"]').forEach(c => {
+                if(c.checked) c.setAttribute('checked', 'checked');
+                else c.removeAttribute('checked');
+            });
+            element.querySelectorAll('textarea').forEach(t => t.textContent = t.value);
+
+            window.scrollTo(0, 0); 
+            if(wrapper) wrapper.style.overflow = 'visible'; 
+
+            var options = {
+                margin: 15,
+                filename: customFileName,
+                image: { type: 'jpeg', quality: 1.0 },
+                html2canvas: { 
+                    scale: 2.0, 
+                    useCORS: true,
+                    windowWidth: 1050,
+                    scrollX: 0, 
+                    scrollY: 0
+                },
+                jsPDF: { 
+                    unit: 'mm', 
+                    format: 'a2', 
+                    orientation: 'portrait' 
+                } 
+            };
+
+            html2pdf().set(options).from(element).save().then(function() {
+                if(wrapper) wrapper.style.overflowX = 'auto';
+
+                element.querySelectorAll('input[type="text"]').forEach(i => { i.value = ""; i.removeAttribute('value'); });
+                element.querySelectorAll('textarea').forEach(t => { t.value = ""; t.textContent = ""; });
+                element.querySelectorAll('input[type="checkbox"]').forEach(c => c.checked = false);
+                element.querySelectorAll('.box-clicker').forEach(b => b.innerText = '');
+            });
+        }
+    </script>
+</body>
+</html>
